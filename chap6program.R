@@ -29,5 +29,14 @@ lcl = grand.mean-A2*R.mean
 UCL=grand.mean+A2*R.mean
 
 #xbar chart plot
-qcc(data=a1$mean,stdev=0.32521,limits=c(lcl,UCL),plot=TRUE)
+qcc(data=a1$mean,std.dev=0.32521,limits=c(lcl,UCL),plot=TRUE)
+
+#S chart model
+D3=0
+D4=2.114
+SLCL = R.mean*D3
+SUCL=R.mean*D4
+
+#s chart plot
+xbar_chart2 <- qcc(data=range.bake, type='R',sizes =5, title="Sample R Chart Title", digits=2, limits=c(0,0.68749),plot=TRUE)
 
