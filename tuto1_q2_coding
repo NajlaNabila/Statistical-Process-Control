@@ -1,0 +1,50 @@
+#IMPORT DATA
+library(readxl)
+SPC1_2 <- read_excel("spc/SPC1.2.xlsx")
+attach(SPC1_2)
+
+#IMPORT PACKAGES
+library(dplyr)
+library(qcc)
+library(fpp3)
+
+#DATA CLEANING
+data <- SPC1_2 |> pivot_longer(c(x1,X2,x3,X4,X5),values_to="value")
+data <- transform(data, Number = as.numeric(Number), 
+          value = as.numeric(value))
+
+# xBARBAR
+a1=data |>
+  group_by(Number) |>
+  summarise_at(vars(value), list(mean = mean))
+
+grand.mean=mean(a1$mean)
+
+# R bar
+a2=data %>%
+  group_by(Number) %>%
+  summarise_at(vars(value), list(max=max,min=min))
+
+range.bake=a2$max-a2$min
+
+R.mean=mean(range.bake)
+
+#xbar chart model
+A2=0.577
+lcl = grand.mean-A2*R.mean
+UCL=grand.mean+A2*R.mean
+
+#xbar chart plot
+qcc(data=a1$mean,std.dev=R.mean,limits=c(lcl,UCL),plot=TRUE)
+
+#S chart model
+D3=0
+D4=2.114
+SLCL = R.mean*D3
+SUCL=R.mean*D4
+
+#s chart plot
+xbar_chart2 <- qcc(data=range.bake, type='R',sizes =5, title="Sample R Chart Title", digits=2, limits=c(SLCL,SUCL),plot=TRUE)
+
+#COMMENT
+#Based on xbar plot, we can conclude that the process is in control since all samples lie within the boundaries.
