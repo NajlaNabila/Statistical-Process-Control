@@ -1,0 +1,30 @@
+#INPUT DATA
+library(readxl)
+spc1 <- read_excel("C:/Users/Asus/OneDrive/Desktop/spc1.xlsx")
+attach(spc1)
+
+#IMPORT LIBRARY
+library(dplyr)
+library(qcc)
+
+#COMPUTE GRAND MEAN
+g.mean <- mean(spc1$xbar)
+
+#COMPUTE R MEAN
+g.R.mean <- mean(spc1$R)
+
+#X BAR CHART 
+A2= 0.577
+upper.cl <- g.mean + A2*grand.mean
+center.l <- g.mean
+lower.cl <- g.mean - A2 *grand.mean
+
+qcc(data=spc1$xbar,std.dev=g.R.mean,limits=c(lower.cl,upper.cl),plot=TRUE)
+
+#R CHART
+D3 = 0
+D4= 2.114
+r.upper.cl <- g.R.mean*D4
+r.lower.cl <- g.R.mean*D3
+
+qcc(data=spc1$R, type='R',sizes =10, title="Sample R Chart Title", digits=3, limits=c(0,r.upper.cl),plot=TRUE)
