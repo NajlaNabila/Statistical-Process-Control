@@ -28,3 +28,9 @@ r.upper.cl <- g.R.mean*D4
 r.lower.cl <- g.R.mean*D3
 
 qcc(data=spc1$R, type='R',sizes =10, title="Sample R Chart Title", digits=3, limits=c(0,r.upper.cl),plot=TRUE)
+
+#COMMENT ON CHART
+#based on the xbar chart, there are samples lie beyond the upper and lower control limit.Hence, we can conclude
+#that the process is out of control.However, the R chart does not shows any irregularities that is 
+#all samples lie inside the boundaries of control limits.
+#In conclusion, we can say that there are possibility that the process is out of control based on the xbar chart.
