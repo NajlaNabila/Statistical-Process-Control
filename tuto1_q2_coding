@@ -48,3 +48,20 @@ xbar_chart2 <- qcc(data=range.bake, type='R',sizes =5, title="Sample R Chart Tit
 
 #COMMENT
 #Based on xbar plot, we can conclude that the process is in control since all samples lie within the boundaries.
+
+#ESIMATE PROCESS CAPABILITY
+d2=2.326
+p.sd= R.mean/d2
+
+#APPROPRIATE TRIAL CONTROL LIMIT
+upper <- grand.mean +3*p.sd
+lower <- grand.mean -3*p.sd
+
+#GIVEN SPECIFICATION +-100
+usl =100
+lsl = -100
+pcr <- (usl-lsl)/(6*p.sd)
+p <- (1/pcr)*100
+#process capability is 1.220997 where the process used up 81.9% of the specification band.
+#Consequently, relatively few non-conforming units will be produced by this process
+
