@@ -1,0 +1,46 @@
+library(readr)
+library(dplyr)
+library(qcc)
+data <- read_csv("C:/Users/Asus/Downloads/1600-2 cam outlet real pos value.csv")
+data <- na.omit(data)
+data<- data[,c(-1:-2)]
+attach(data)
+
+#split data
+data1 <- data[c(1:400),]
+data2 <- data[c(401:865),]
+
+#################################  PHASE 1  ##############################################################
+#m=40,n=5
+data1$group <- as.factor(rep(1:40,10))
+new_data1 <- data1 %>% group_by(group) %>% slice_sample(n=5)
+
+#xbarbar
+avg_subgp <- new_data1%>% group_by(group)%>% summarise_at(vars(Aktiviti1600.2),list(mean=mean))
+avg_grand <- mean(avg_subgp$mean)
+
+#R bar
+maxmin_subgp=new_data1 %>%
+  group_by(group) %>%
+  summarise_at(vars(Aktiviti1600.2), list(max=max,min=min))
+range_subgp <- maxmin_subgp$max-maxmin_subgp$min
+range_mean <- mean(range_subgp)
+
+#xbar chart model
+A2=0.577
+lcl = avg_grand-A2*range_mean
+UCL=avg_grand+A2*range_mean
+
+#xbar chart plot
+p1_x <- qcc(data=avg_subgp$mean,std.dev=range_mean,limits=c(lcl,UCL),plot=TRUE)
+#obs 8 and 31 is out of lcl
+
+#S chart model
+D3=0
+D4=2.114
+SLCL = range_mean*D3
+SUCL=range_mean*D4
+
+#s chart plot
+p1_s <- qcc(data=range_subgp, type='R',sizes =5, title="Sample R Chart Title", digits=2, limits=c(SLCL,SUCL),plot=TRUE)
+#obs 8 and obs 31 is out of ucl
