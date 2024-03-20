@@ -44,3 +44,66 @@ SUCL=range_mean*D4
 #s chart plot
 p1_s <- qcc(data=range_subgp, type='R',sizes =5, title="Sample R Chart Title", digits=2, limits=c(SLCL,SUCL),plot=TRUE)
 #obs 8 and obs 31 is out of ucl
+
+#### remove obs 8 and 31 #############
+new_data2 <- new_data1 %>% filter(group !='8')%>% filter(group !='31')
+
+##################### phase 1(deleted data) #########################
+#xbarbar
+avg_subgp <- new_data2%>% group_by(group)%>% summarise_at(vars(Aktiviti1600.2),list(mean=mean))
+avg_grand <- mean(avg_subgp$mean)
+
+#R bar
+maxmin_subgp=new_data2 %>%
+  group_by(group) %>%
+  summarise_at(vars(Aktiviti1600.2), list(max=max,min=min))
+range_subgp <- maxmin_subgp$max-maxmin_subgp$min
+range_mean <- mean(range_subgp)
+
+#xbar chart model
+A2=0.577
+lcl = avg_grand-A2*range_mean
+UCL=avg_grand+A2*range_mean
+
+#xbar chart plot
+p1_x <- qcc(data=avg_subgp$mean,std.dev=range_mean,limits=c(lcl,UCL),plot=TRUE)
+#comment : in-control process
+#type : 
+
+#S chart model
+D3=0
+D4=2.114
+SLCL = range_mean*D3
+SUCL=range_mean*D4
+
+#s chart plot
+p1_s <- qcc(data=range_subgp, type='R',sizes =5, title="Sample R Chart Title", digits=2, limits=c(SLCL,SUCL),plot=TRUE)
+#comment : in control process
+
+########################## phase 2 ######################################################
+#m=46, n=5
+data2$group <- as.factor(rep(41:86,10))
+new_data3 <- data2 %>% group_by(group) %>% slice_sample(n=5)
+p2_data <- rbind(new_data2,new_data3)
+
+#xbarbar
+mean_subgp <- p2_data%>% group_by(group)%>% summarise_at(vars(Aktiviti1600.2),list(mean=mean))
+mean_grand <- mean(mean_subgp$mean)
+
+#R bar
+mm_subgp=p2_data %>%
+  group_by(group) %>%
+  summarise_at(vars(Aktiviti1600.2), list(max=max,min=min))
+r_subgp <- mm_subgp$max-mm_subgp$min
+r_mean <- mean(r_subgp)
+
+#xbar chart plot
+p2_x <- qcc(data=mean_subgp$mean,std.dev=r_mean,limits=c(lcl,UCL),plot=TRUE)
+#comment : in-control process
+#type : 
+
+p2_s <- qcc(data=r_subgp, type='R',sizes =5, title="Sample R Chart Title", digits=2, limits=c(SLCL,SUCL),plot=TRUE)
+
+############### phase 2 (removing 69 obs )##################
+new_data4 <- p2_data %>% filter(group !='69')
+
