@@ -142,3 +142,49 @@ p(x<0.502)+p(x>0.504)
 revised_sd <- revised_mean_range/2.326
 pnorm((0.502-revised_grand_mean)/(revised_sd))+pnorm((0.504-revised_grand_mean)/(revised_sd),lower.tail=FALSE)
 ```
+100% of the bearings produced will be outside of the specifications.
+
+QUESTION 2 6.17 A
+
+```{R}
+d2_new=1.693
+d2_old=2.326
+A2_new=1.023
+D4_new=2.574
+D3_new=0
+
+#r chart
+control_limit= d2_new/d2_old
+ucl = D4_new*control_limit*revised_mean_range #8.4308
+lcl = 0
+
+# x chart
+x_ucl = revised_grand_mean+(A2_new*control_limit*revised_mean_range) #37.00524
+center_line= revised_grand_mean
+x_lcl = revised_grand_mean- (A2_new*control_limit*revised_mean_range) #30.3039
+```
+QUESTION 2 6.17 B SKIPPED
+
+QUESTION 2 6.17 C 
+
+```{r}
+d2_8 <- 2.847
+d2_3 <- 1.693
+A2_8=0.373
+D4_8=1.864
+D3_8=0.136
+
+#r chart
+control_limit= d2_8/d2_3
+ucl = D4_8*control_limit*revised_mean_range #14.10551
+lcl = D3_8*control_limit*revised_mean_range #max(0,1.029158)
+
+# x chart
+x_ucl = revised_grand_mean+(A2_8*control_limit*revised_mean_range) #36.47716
+center_line= revised_grand_mean
+x_lcl = revised_grand_mean- (A2_8*control_limit*revised_mean_range) #30.83193
+
+```
+
+
+QUESTION 2 6.17 D SKIPPED
