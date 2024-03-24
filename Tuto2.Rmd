@@ -1,0 +1,144 @@
+---
+title: "TUTORIAL 2 SPC"
+author: "group"
+date: "2024-03-24"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+TUTORIAL 1 - Q1-A
+
+```{r setup, include=FALSE}
+library(readxl)
+library(qcc)
+data <- read_excel("spc/SPC2.1.xlsx")
+```
+
+The Grand Mean
+```{r}
+xbarbar <- mean(data$XBAR)
+xbarbar
+```
+
+The Grand Range
+
+```{r}
+rbar <- mean(data$R)
+```
+
+The X chart
+
+```{r}
+A2=0.577
+lcl = xbarbar-A2*rbar
+UCL = xbarbar+A2*rbar
+
+#xbar chart plot
+x_chart <- qcc(data=data$XBAR,std.dev=rbar,limits=c(lcl,UCL),plot=TRUE)
+```
+
+The R chart
+
+```{r}
+D3=0
+D4=2.114
+SLCL = rbar*D3
+SUCL=rbar*D4
+
+#r chart plot
+r_chart <- qcc(data=data$R, type='R',sizes =5, title="Sample R Chart Title", digits=2, limits=c(SLCL,SUCL),plot=TRUE)
+```
+
+COMMENT :
+since all samples data in X chart and R chart are within the control limits, hence the process is in control.
+
+Q1 -B 
+
+```{R}
+SPC2_1_B <- read_excel("spc/SPC2.1.B.xlsx")
+add_data <- rbind(data,SPC2_1_B)
+add_xbarbar <- mean(add_data$XBAR)
+add_rbar <- mean(add_data$R)
+```
+
+```{r}
+x_chart <- qcc(data=add_data$XBAR,std.dev=add_rbar,limits=c(lcl,UCL),plot=TRUE)
+```
+
+```{r}
+r_chart <- qcc(data=add_data$R, type='R',sizes =5, title="Sample R Chart Title", digits=2, limits=c(SLCL,SUCL),plot=TRUE)
+```
+
+COMMENT : Both R chart and X chart shows nonrandom pattern. First, we look at the R chart, we see that the pattern shows an increasing trend starting at sample 24th where most of the points have been exceeding the upper control limit.We may conclude this is due to the assignable causes.Thus we need to eliminate this causes first to automatically eliminate the nonrandom pattern in x bar chart. From the x bar chart, we can see a shift occur in process level starting from sample 24th.
+
+QUESTION 2
+
+```{R}
+SPC2_2 <- read_excel("spc/SPC2.2.xlsx")
+grand_mean <- mean(SPC2_2$x)
+mean_range <- mean(SPC2_2$R)
+```
+
+The X chart
+
+```{r}
+A2=0.577
+lcl = grand_mean-A2*mean_range
+UCL = grand_mean+A2*mean_range
+
+#xbar chart plot
+x_chart <- qcc(data=SPC2_2$x,std.dev=mean_range,limits=c(lcl,UCL),plot=TRUE)
+```
+
+The R chart
+
+```{r}
+D3=0
+D4=2.114
+SLCL = mean_range*D3
+SUCL=mean_range*D4
+
+#r chart plot
+r_chart <- qcc(data=SPC2_2$R, type='R',sizes =5, title="Sample R Chart Title", digits=2, limits=c(SLCL,SUCL),plot=TRUE)
+```
+
+COMMENT : The R chart shows that the process is in control while the X chart shows two samples ( 12th and 15th) are out of upper control limit.Hence, we remove this two points and revise the trial control limit.
+
+```{r}
+library(dplyr)
+revised_SPC2_2 <- SPC2_2[-c(12,15),]
+revised_grand_mean <- mean(revised_SPC2_2$x)
+revised_mean_range <- mean(revised_SPC2_2$R)
+```
+
+The X chart
+
+```{r}
+A2=0.577
+revised_lcl = revised_grand_mean-A2*revised_mean_range
+revised_UCL = revised_grand_mean+A2*revised_mean_range
+
+#xbar chart plot
+x_chart <- qcc(data=revised_SPC2_2$x,std.dev=revised_mean_range,limits=c(revised_lcl,revised_UCL),plot=TRUE)
+```
+
+The R chart
+
+```{r}
+D3=0
+D4=2.114
+revised_SLCL = revised_mean_range*D3
+revised_SUCL= revised_mean_range*D4
+
+#r chart plot
+r_chart <- qcc(data=revised_SPC2_2$R, type='R',sizes =5, title="Sample R Chart Title", digits=2, limits=c(revised_SLCL,revised_SUCL),plot=TRUE)
+```
+
+QUESTION 2 6.1 B
+
+p(x<0.502)+p(x>0.504)
+```{R}
+revised_sd <- revised_mean_range/2.326
+pnorm((0.502-revised_grand_mean)/(revised_sd))+pnorm((0.504-revised_grand_mean)/(revised_sd),lower.tail=FALSE)
+```
