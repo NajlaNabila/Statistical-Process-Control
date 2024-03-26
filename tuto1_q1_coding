@@ -35,16 +35,31 @@ qcc(data=spc1$R, type='R',sizes =5, title="Sample R Chart Title", digits=2, limi
 #all samples lie inside the boundaries of control limits.
 #In conclusion, we can say that there are possibility that the process is out of control based on the xbar chart.
 
-#ESTIMATE PROCESS CAPABILITY
-usl = 0.5030 +0.0010
-lsl = 0.5030 -0.0010
+#this occurrence might be due to the same assignable causes due to the sample 14th has the same pattern from graph.
+
+#ESTIMATE PROCESS CAPABILITY (purpose : to understand the chance of non-comforming products that will be produced.)
+usl = 40
+lsl = 20
 d2=2.326
 p.sd= g.R.mean/d2
 pcr <- (usl-lsl)/(6*p.sd)
 #PERCENTAGE OF SPECIFICATION BAND
 p <- (1/pcr)*100
-#the process uses up 607265.7% of the specification band.
+#the process uses up 60.72657% of the specification band.
 
-#APPROPRIATE TRIAL CONTROL LIMIT
-upper <- g.mean +3*p.sd
-lower <- g.mean -3*p.sd
+#APPROPRIATE TRIAL CONTROL LIMIT (remove the 12th and 15th sample)
+rev_spc1 <- spc1[-c(12,15),]
+rev_g.mean <- mean(rev_spc1$xbar)
+rev_g.R.mean <- mean(rev_spc1$R)
+
+#X BAR CHART 
+A2= 0.577
+rev_upper.cl <- rev_g.mean + A2*rev_g.R.mean
+rev_center.l <- rev_g.mean
+rev_lower.cl <- rev_g.mean - A2 *rev_g.R.mean
+
+#R CHART
+D3 = 0
+D4= 2.114
+rev_r.upper.cl <- rev_g.R.mean*D4
+rev_r.lower.cl <- rev_g.R.mean*D3
