@@ -37,31 +37,100 @@ UCL=grand.mean+A2*R.mean
 #xbar chart plot
 qcc(data=a1$mean,std.dev=R.mean,limits=c(lcl,UCL),plot=TRUE)
 
-#S chart model
+#R chart model
 D3=0
 D4=2.114
 SLCL = R.mean*D3
 SUCL=R.mean*D4
 
-#s chart plot
+#R chart plot
 xbar_chart2 <- qcc(data=range.bake, type='R',sizes =5, title="Sample R Chart Title", digits=2, limits=c(SLCL,SUCL),plot=TRUE)
 
 #COMMENT
 #Based on xbar plot, we can conclude that the process is in control since all samples lie within the boundaries.
+#stratification : too good: something wrong with the recording of the data
 
-#ESIMATE PROCESS CAPABILITY
+#ESIMATE PROCESS CAPABILITY(CHOOSE +-50)
 d2=2.326
 p.sd= R.mean/d2
+usl =50
+lsl = -50
+pcr <- (usl-lsl)/(6*p.sd)
+p <- (1/pcr)*100
 
 #APPROPRIATE TRIAL CONTROL LIMIT
-upper <- grand.mean +3*p.sd
-lower <- grand.mean -3*p.sd
+
+
+# Function to replace zeros with row-wise averages
+replace_zeros_with_avg <- function(df) {
+  # Calculate row-wise averages
+  row_avgs <- rowMeans(df)
+  
+  # Identify indices of zeros
+  zero_indices <- which(df == 0, arr.ind = TRUE)
+  
+  # Replace zeros with row-wise averages
+  for (i in 1:nrow(zero_indices)) {
+    row_index <- zero_indices[i, 1]
+    col_index <- zero_indices[i, 2]
+    df[row_index, col_index] <- row_avgs[row_index]
+  }
+  
+  return(df)
+}
+
+# Replace zeros with row-wise averages
+new_df <- replace_zeros_with_avg(SPC1_2)
+
+print("DataFrame with Zeros Replaced by Row-wise Averages:")
+print(new_df)
+
+#DATA CLEANING
+new_data <- new_df |> pivot_longer(c(x1,X2,x3,X4,X5),values_to="value")
+
+
+# xBARBAR
+new_a1=new_data |>
+  group_by(Number) |>
+  summarise_at(vars(value), list(mean = mean))
+
+new_grand.mean=mean(new_a1$mean)
+
+# R bar
+new_a2=new_data %>%
+  group_by(Number) %>%
+  summarise_at(vars(value), list(max=max,min=min))
+
+new_range.bake=new_a2$max-new_a2$min
+
+new_R.mean=mean(new_range.bake)
+
+#xbar chart model
+A2=0.577
+new_lcl = new_grand.mean-A2*new_R.mean
+new_UCL=new_grand.mean+A2*new_R.mean
+
+#xbar chart plot
+qcc(data=new_a1$mean,std.dev=new_R.mean,limits=c(new_lcl,new_UCL),plot=TRUE)
+
+#R chart model
+D3=0
+D4=2.114
+new_SLCL = new_R.mean*D3
+new_SUCL=new_R.mean*D4
+
+#R chart plot
+new_xbar_chart2 <- qcc(data=new_range.bake, type='R',sizes =5, title="Sample R Chart Title", digits=2, limits=c(new_SLCL,new_SUCL),plot=TRUE)
 
 #GIVEN SPECIFICATION +-100
 usl =100
 lsl = -100
-pcr <- (usl-lsl)/(6*p.sd)
+new_p.sd <- new_R.mean/d2
+pcr <- (usl-lsl)/(6*new_p.sd)
 p <- (1/pcr)*100
-#process capability is 1.220997 where the process used up 81.9% of the specification band.
+#process capability is 1.245682 where the process used up 80.3% of the specification band.
 #Consequently, relatively few non-conforming units will be produced by this process
+
+#remove 0 divide by 3 or do x chart and s chart (NOT COVERED YET)
+#or do imputation.
 
