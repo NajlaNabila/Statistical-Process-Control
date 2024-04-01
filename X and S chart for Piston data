@@ -1,0 +1,33 @@
+library(readr)
+PistonRingData <- read_csv("spc/PistonRingData.csv")
+attach(PistonRingData)
+
+library(dplyr)
+library(qcc)
+a1 <- PistonRingData%>% group_by(`Sample Number`) %>% summarise_at(vars(`Inner Diameter`),list(mean=mean))
+grand.mean <- mean(a1$mean)
+
+
+a4 <- PistonRingData %>% group_by(`Sample Number`) %>% summarise_at(vars(`Inner Diameter`),list(sd=sd))
+mean.sd <- mean(a4$sd)
+
+A3 <- 1.427
+B3 <- 0
+B4 <- 2.089
+x.ucl <- grand.mean + 1.427*mean.sd
+x.lcl <- grand.mean - 1.427*mean.sd
+s.ucl <- 2.089*mean.sd
+s.lcl <- 0*mean.sd
+
+qcc(data=a1$mean, type="xbar.one", title=" Sample X bar Chart",stdev=mean.sd, limits=c(x.lcl,x.ucl),plot=TRUE)
+qcc(data=a4$sd, type="S", sizes=5, title= "Sample S Chart", digits=4, limits=c(s.lcl,s.ucl),stdev=mean.sd,plot=TRUE)
+#There are no indication that the process is out of control. Hence those limits can be adopted for phase II monitoring process.
+
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+PistonRingDataModified <- read_csv("spc/PistonRingDataModified.csv")
+attach(PistonRingDataModified)
+
+
+diameterP <- qcc.groups(`Inner Diameter`, `Sample Number`)
+summary(qcc(diameterP,type="xbar"))
+summary(qcc(diameterP,type="S"))
