@@ -1,0 +1,54 @@
+
+```{r setup, include=FALSE}
+library(readxl)
+library(qcc)
+data <- read_excel("spc/SPC2.1.xlsx")
+```
+
+The Grand Mean
+```{r}
+xbarbar <- mean(data$XBAR)
+xbarbar
+```
+
+The mean standard deviation
+```{r}
+data$sd <- round(apply(data, 1, sd, na.rm=TRUE),3)
+sbar<- mean(data$sd)
+sbar
+```
+
+The X chart
+
+```{r}
+A3=1.427
+x.lcl = xbarbar-1.427*sbar
+x.UCL = xbarbar+1.427*sbar
+
+#xbar chart plot
+x_chart <- qcc(data=data$XBAR, type="xbar.one", title=" Sample X bar Chart",stdev=sbar, limits=c(x.lcl,x.UCL),plot=TRUE)
+```
+
+The s chart
+
+```{r}
+B3=0
+B4=2.089
+SLCL = sbar*B3
+SUCL=sbar*B4
+
+#r chart plot
+r_chart <- qcc(data=data$sd, type='S',sizes =5, title="Sample S Chart Title", digits=2, limits=c(SLCL,SUCL),plot=TRUE)
+```
+
+######################################
+```{r}
+SPC2_1_B <- read_excel("spc/SPC2.1.B.xlsx")
+SPC2_1_B$sd <- apply(SPC2_1_B, 1, sd, na.rm=TRUE)
+
+#xbar chart plot
+x_chart <- qcc(data=SPC2_1_B$XBAR, type="xbar.one", title=" Sample X bar Chart",stdev=sbar, limits=c(x.lcl,x.UCL),plot=TRUE)
+
+r_chart <- qcc(data=SPC2_1_B$sd, type='S',sizes =5, title="Sample S Chart Title", digits=2, limits=c(SLCL,SUCL),plot=TRUE)
+
+```
