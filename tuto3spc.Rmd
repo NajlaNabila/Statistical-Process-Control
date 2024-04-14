@@ -1,0 +1,119 @@
+---
+title: "Tutorial 3 sit3009"
+output: html_document
+date: "2024-04-01"
+---
+
+```{r}
+strength <- read.csv("strength.csv")
+#xbar chart
+library(dplyr)
+library(qcc)
+grand.mean=mean(strength$xbar)
+grand.mean
+r_bar=mean(strength$r)
+r_bar
+lcl_xbar=grand.mean-(0.577*r_bar)
+lcl_xbar
+ucl_xbar=grand.mean+(0.577*r_bar)
+ucl_xbar
+xbar_chart <- qcc(data = strength$xbar,type = "xbar.one", stdev = r_bar , title = "Sample XBar Chart", digits = 4,
+                  limits = c(lcl_xbar,ucl_xbar), plot = TRUE)
+```
+
+
+```{r}
+#r_chart
+lcl_r=0*r_bar
+lcl_r
+ucl_r=2.114*r_bar
+ucl_r
+r_chart <- qcc(data = strength$r, type ="R",sizes = 5, title = "Sample R Chart", digits = 4,
+               limits = c(lcl_r,ucl_r), plot = TRUE)
+```
+
+
+b)
+
+```{r}
+new<-read.csv("newstr.csv")
+#xbar chart
+library(dplyr)
+library(qcc)
+grand.mean=mean(strength$xbar)
+grand.mean
+r_bar=mean(strength$r)
+r_bar
+lcl_xbar=grand.mean-(0.577*r_bar)
+lcl_xbar
+ucl_xbar=grand.mean+(0.577*r_bar)
+ucl_xbar
+xbar_chart1 <- qcc(data = new$xbar,type = "xbar.one", stdev = r_bar , title = "Sample XBar Chart", digits = 4,
+                  limits = c(lcl_xbar,ucl_xbar), plot = TRUE)
+```
+
+```{r}
+#r_chart
+lcl_r=0*r_bar
+lcl_r
+ucl_r=2.114*r_bar
+ucl_r
+r_chart1 <- qcc(data = new$r, type ="R",sizes = 5, title = "Sample R Chart", digits = 4,
+               limits = c(lcl_r,ucl_r), plot = TRUE)
+```
+
+
+############################################################################################
+QUESTION 6.16.( using xbar and s chart)
+a)
+```{r}
+#exclude sample,xbar and r (easy to calculate sd for each row )
+strength1<- strength[,-c(1:3)]
+  View(strength1)
+s <- apply(strength1, 1, sd, na.rm=TRUE)
+strength$s<- s 
+print(strength)
+```
+
+```{r}
+grand.mean<- mean(strength$xbar)
+s.bar<- mean(strength$s)
+#n=5,A3=1.427
+ucl.xbar=grand.mean+ (1.427*s.bar)
+lcl.xbar=grand.mean- (1.427*s.bar)
+xbar.chart1 <- qcc(data = strength$xbar,type = "xbar.one", stdev = s.bar , title = "Sample XBar Chart", digits = 4,
+                  limits = c(lcl.xbar,ucl.xbar), plot = TRUE)
+
+```
+
+
+S chart 
+
+```{r}
+#n=5, B3= 0,B4= 2.089
+ucl.r= 2.049*s.bar
+lcl.r= 0*s.bar 
+s.chart <- qcc(data = strength$s, type ="S",sizes = 5, title = "Sample S Chart", digits = 4,
+               limits = c(lcl.r,ucl.r), plot = TRUE)
+```
+
+
+#####
+```{r}
+new<-read.csv("newstr.csv")
+new1<-new[,-c(1:3)]
+View(new1)
+s <- apply(new1, 1, sd, na.rm=TRUE)
+new$s<- s 
+print(new)
+```
+```{r}
+xbar.chart2 <- qcc(data = new$xbar,type = "xbar.one", stdev = s.bar , title = "Sample XBar Chart", digits = 4,
+                  limits = c(lcl.xbar,ucl.xbar), plot = TRUE)
+```
+
+```{r}
+s.chart <- qcc(data = new$s, type ="S",sizes = 5, title = "Sample S Chart", digits = 4,
+               limits = c(lcl.r,ucl.r), plot = TRUE)
+```
+
