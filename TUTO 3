@@ -13,7 +13,7 @@ xbarbar
 
 The mean standard deviation
 ```{r}
-data$sd <- round(apply(data, 1, sd, na.rm=TRUE),3)
+data$sd <- round(apply(data[,c(2:6)], 1, sd, na.rm=TRUE),3)
 sbar<- mean(data$sd)
 sbar
 ```
@@ -44,7 +44,7 @@ r_chart <- qcc(data=data$sd, type='S',sizes =5, title="Sample S Chart Title", di
 ######################################
 ```{r}
 SPC2_1_B <- read_excel("spc/SPC2.1.B.xlsx")
-SPC2_1_B$sd <- apply(SPC2_1_B, 1, sd, na.rm=TRUE)
+SPC2_1_B$sd <- apply(SPC2_1_B[,c(2:6)], 1, sd, na.rm=TRUE)
 
 #xbar chart plot
 x_chart <- qcc(data=SPC2_1_B$XBAR, type="xbar.one", title=" Sample X bar Chart",stdev=sbar, limits=c(x.lcl,x.UCL),plot=TRUE)
