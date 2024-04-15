@@ -1,0 +1,58 @@
+---
+title: "control chart attributes 1"
+author: "Najla"
+date: "2024-04-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(qcc)
+library(dplyr)
+orangeJuice <- read.csv("C:/Users/Asus/Downloads/orangeJuice.csv")
+attach(orangeJuice)
+p <- sum(Number.of.Nonconforming.Cans..Di)/(30*50)
+
+trial_ucl <- p + 3*sqrt((p*(1-p))/50)
+trial_lcl <- p - 3*sqrt((p*(1-p))/50)
+
+qcc(data=orangeJuice$Sample.Fraction.Nonconforming..pi,type="p", sizes=1, stdev=sqrt((p*(1-p))/50),limits=c(trial_lcl,trial_ucl),plot=TRUE)
+```
+
+Since the assignable cause can be determined to explain the samples 15 and 23 to be out of control, we can eliminate the the samples and revised the control limits.
+
+```{r}
+orangejuice <- orangeJuice[-c(15,23),]
+p <- sum(orangejuice$Number.of.Nonconforming.Cans..Di)/(28*50)
+
+revised_ucl <- p + 3*sqrt((p*(1-p))/50)
+revised_lcl <- p - 3*sqrt((p*(1-p))/50)
+
+#using the revised cl but use previous data that does not exclude the samples
+qcc(data=orangeJuice$Sample.Fraction.Nonconforming..pi,type="p", sizes=1, stdev=sqrt((p*(1-p))/50),limits=c(revised_lcl,revised_ucl),plot=TRUE)
+```
+
+The samples of 13 and 23 are still out of control, plust samples 21 also exceed the ucl.Hence, this annotation of control charts to indicate unusual points, process adjustments or the type of investigations forms a useful record for future process analysis.
+Since sample 21 cannot determined the assignable cause, hence we just retain it and conclude that this cl can be used in future studies.
+
+**************phase 2 ***********************
+```{r}
+orangeJuice1 <- read.csv("C:/Users/Asus/Downloads/orangeJuice1.csv")
+qcc(data=orangeJuice$Sample.Fraction.Nonconforming..pi,type="p", sizes=1,center=p, stdev=sqrt((p*(1-p))/50),limits=c(revised_lcl,revised_ucl),newdata=orangeJuice1$Sample.Fraction.Nonconforming..pi,newsizes=1,plot=TRUE)
+```
+From the phase 2 chart, we see that the process now operating at the better level(low p, low nonconforming) than the center line of level 0.215. From the proportion test, the level for old data and new data does differ. Hnece, we set up again the trial cl by using the new data.
+
+```{r}
+p <- sum(orangeJuice1$Number.of.Nonconforming.Cans..Di)/(24*50)
+
+revised_ucl <- p + 3*sqrt((p*(1-p))/50)
+revised_lcl <- p - 3*sqrt((p*(1-p))/50)
+
+orangeJuice2 <- read.csv("C:/Users/Asus/Downloads/orangeJuice2.csv")
+
+#using the revised cl but use previous data that does not exclude the samples
+qcc(data=orangeJuice$Sample.Fraction.Nonconforming..pi,type="p", sizes=1, stdev=sqrt((p*(1-p))/50),limits=c(revised_lcl,revised_ucl),plot=TRUE,newdata=orangeJuice2$Sample.Fraction.Nonconforming..pi,newsizes=1, center=p)
+```
