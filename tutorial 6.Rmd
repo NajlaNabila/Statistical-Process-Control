@@ -1,0 +1,55 @@
+---
+title: "Tutorial 6"
+author: "Najla"
+date: "2024-04-26"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(qcc)
+library(dplyr)
+install.packages("cusumcharter")
+library(cusumcharter)
+```
+
+EXERCISE 9.1
+```{R}
+observation_number <- c(1:20)
+x <- c(1045,1055,1037,1064,1095,1008,1050,1087,1125,1146,1139,1169,1151,1128,1238,1125,1163,1188,1146,1167)
+weight <- data.frame(observation_number, x)
+```
+
+```{r}
+q <- cusum(x, std.dev = 25, se.shift=1, center=1050, decision.interval=5)
+cbind(q$pos, q$neg)
+
+cusum_control(x, target=1050,std_dev=25,k=0.5,h=5,desired_shift=1)
+
+```
+Note that C+ of obs 10 is 170.5 > decision=5*25=125. Since N+ is 3, we would conclude that the process was last in control at period 10-3=7. So the process above observations 7 on upper side are all out of control.
+
+
+EXERCISE 9.4
+```{R}
+sample <- c(1:24)
+x <- c(8,8.01,8.02,8.01,8,8.01,8.06, 8.07,8.01,8.04,8.02,8.01,8.05,8.04,8.03,8.05,8.06,8.04,8.05,8.06,8.04,8.02,8.03,8.05)
+fill <- data.frame(sample,x)
+```
+
+```{r}
+s<-cusum(x,decision.interval=4.47,center=8.02, std.dev=0.05,k=0.5,se.shift=1)
+cbind(s$pos, s$neg)
+cusum_control(x, target=8.02,std_dev=0.05,k=0.5,h=4.47,desired_shift=1)
+```
+
+EXERCISE 9.5
+```{R}
+s<-cusum(x,decision.interval=8.01,center=8.02, std.dev=0.05,k=0.25,se.shift=1)
+cbind(s$pos, s$neg)
+cusum_control(x, target=8.02,std_dev=0.05,k=0.25,h=8.01,desired_shift=1)
+
+```
+

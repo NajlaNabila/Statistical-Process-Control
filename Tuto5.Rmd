@@ -1,0 +1,181 @@
+---
+title: "TUTORIAL 5"
+author: "Najla"
+date: "2024-04-21"
+output:
+  word_document: default
+  html_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(qcc)
+library(dplyr)
+```
+
+Table 7E.10
+```{r}
+plate_number <- c(1:25)
+number_nonconform <- c(1,0,4,3,1,2,5,0,2,1,1,0,8,0,2,1,3,5,4,6,3,1,0,2,4)
+plates <- data.frame(plate_number, number_nonconform)
+```
+
+exercise 7.36
+```{r}
+np <- mean(number_nonconform)
+np
+npq <- sd(number_nonconform)
+npq
+
+np_ucl <- np + 3*sqrt(npq)
+np_ucl
+
+np_cl <- np
+np_cl
+
+np_lcl <- np - 3*sqrt(npq)
+np_lcl=0
+
+qcc(data=number_nonconform, type="np", sizes=1, stdev=1.455665, limits=c(np_lcl,np_ucl), plot=TRUE)
+```
+
+The np Chart shows one subgroup are out of upper control limit. So, we may conclude the process is out of control.
+
+Table 7E.11
+```{r}
+Day <- c(1:20)
+number_rolls_produced <- c(18,18,24,22,22,22,20,20,20,20,18,18,18,20,20,20,24,24,22,21)
+total_imperfections <- c(12,14,20,18,15,12,11,15,12,10,18,14,9,10,14,13,16,18,20,17)
+paper <- data.frame(Day, number_rolls_produced, total_imperfections)
+```
+
+Exercise 7.37
+
+```{r}
+#variable u : 
+paper1 <- paper %>% group_by(Day) %>% mutate(mean= total_imperfections/number_rolls_produced)
+ubar <- mean(paper1$mean)
+ubar
+
+paper.ucl <- paper1 %>% group_by(Day) %>% mutate(ucl = ubar + 3*sqrt(ubar/number_rolls_produced))
+paper.lcl <- paper.ucl %>% group_by(Day) %>% mutate(lcl = ubar - 3*sqrt(ubar/number_rolls_produced))
+paper.lcl
+
+qcc(data=paper1$mean, sizes=1, type="u", limits=c(paper.lcl$lcl,paper.ucl$ucl))
+```
+
+Exercise 7.38
+```{r}
+#averaged u : 
+avg_n <- mean(number_rolls_produced)
+avg_n
+
+paper2 <- paper %>% group_by(Day) %>% mutate(mean= total_imperfections/avg_n)
+ubar2 <- mean(paper2$mean)
+
+avg.ucl <- ubar2 + 3*sqrt(ubar2/avg_n)
+avg.ucl
+
+avg.lcl <- ubar2 - 3*sqrt(ubar2/avg_n)
+avg.lcl
+
+qcc(data=paper2$mean, sizes=1, type="u", stdev=sqrt(ubar2/avg_n), limits=c(avg.lcl,avg.ucl))
+```
+
+The process seems to be in control.
+
+Table 7E.13
+
+```{r}
+sample_number <- c(1:22)
+number_nonconformities <- c(1,1,3,7,8,10,5,13,0,19,24,6,9,11,15,8,3,6,7,4,9,20)
+telephone <- data.frame(sample_number, number_nonconformities)
+```
+
+Exercise 7.41
+```{r}
+cbar <- mean(number_nonconformities)
+cbar
+
+c_ucl <- cbar+ 3*sqrt(cbar)
+c_ucl
+
+c_lcl <- cbar- 3*sqrt(cbar)
+c_lcl=0
+
+qcc(data=number_nonconformities, type="c", sizes=1, stdev= sqrt(cbar), limits=c(c_lcl,c_ucl),plot=TRUE)
+```
+
+From the chart, we see that there are 3 subgroups, 10,11 22 are out of control limit. Hence, we may conclude that the process is out of control.
+For the future production, we may identify the assingnable causes of the out control subgroups and produced a revised control limits by eliminating the assignable causes subgroups.
+
+```{r}
+nonconformities <- c(1,1,3,7,8,10,5,13,0,6,9,11,15,8,3,6,7,4,9)
+
+cbar1 <- mean(nonconformities)
+cbar1
+
+c_ucl1 <- cbar1+ 3*sqrt(cbar1)
+c_ucl1
+
+c_lcl1 <- cbar1- 3*sqrt(cbar1)
+c_lcl1=0
+
+qcc(data=nonconformities, type="c", sizes=1, stdev= sqrt(cbar1), limits=c(c_lcl1,c_ucl1),plot=TRUE)
+```
+
+we see thats subgroups 13 is out of control, hence we need to eliminate subgropus 13.
+```{r}
+nonconformities1 <- c(1,1,3,7,8,10,5,13,0,6,9,11,8,3,6,7,4,9)
+cbar2 <- mean(nonconformities1)
+cbar2
+
+c_ucl2 <- cbar2+ 3*sqrt(cbar2)
+c_ucl2
+
+c_lcl2 <- cbar2- 3*sqrt(cbar2)
+c_lcl2=0
+
+qcc(data=nonconformities1, type="c", sizes=1, stdev= sqrt(cbar2), limits=c(c_lcl2,c_ucl2),plot=TRUE)
+```
+
+Now, the process is in control.
+
+EXERCISE 7.43
+
+```{r}
+#The new inspection unit is 2.5 of the old unit
+
+# C CHART FOR TOTAL NUMBER OF NONCONFORMITIES IN NEW INSPECTION UNIT :  
+new_cl <- cbar2*2.5
+new_cl 
+
+new_c_ucl <- new_cl + 3*sqrt(new_cl)
+new_c_ucl
+
+new_c_lcl <- new_cl - 3*sqrt(new_cl)
+new_c_lcl
+
+qcc(data=nonconformities1*2.5, type="c", sizes=1, stdev= sqrt(new_cl), limits=c(new_c_lcl,new_c_ucl),plot=TRUE)
+```
+
+b)
+```{r}
+xbar <- mean(nonconformities1)
+
+#Average number of non-conformities per inspection unit,n
+n=1000/2500
+u_ubar <- xbar/n
+u_ubar
+
+#center line and control limits for u chart
+center_line <- u_ubar
+u_ucl <- u_ubar + 3*sqrt(u_ubar/0.4)
+u_ucl
+u_lcl <- u_ubar - 3*sqrt(u_ubar/0.4)
+u_lcl=0
+
+qcc(data=nonconformities1/n, type="u", sizes=1, stdev= sqrt(u_ubar), limits=c(u_lcl,u_ucl),plot=TRUE)
+```
