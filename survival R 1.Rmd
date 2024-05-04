@@ -1,0 +1,90 @@
+---
+title: "kaplan maier (survival)"
+author: "NUR NAJLA NABILA BT AZMAN"
+date: "week 8"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r }
+
+install.packages("survival")
+library(survival)
+attach(leukemia)
+leukemia
+
+object <- Surv(time,status)
+#please look for help survfit
+survfit(object~x, data=leukemia)
+survfit(object~x, data=leukemia, conf.type="none")
+survfit(object~x, data=leukemia, conf.type="plain")
+fit <- survfit(object~x, data=leukemia, conf.type="log-log")
+summary(fit)
+```
+
+```{r}
+#b) plot kaplam meier
+
+#lty=line type
+plot(fit,lty=c(1,2), col=c(1,2),ylab="Survival",xlab="Time", legend("topright", c("maintained","non-maintained"), lty=c(1,2),col=c(1,2)))
+```
+ maintained has longer survival
+ 
+```{r}
+#c) the 25th quantile and median survival time
+summary(fit)[]
+
+time <- summary(fit)$time
+surv<- summary(fit)$surv
+p <- 0.5
+min(time[surv<=1-p])
+
+fit1 <- survfit(Surv(time[x=="Maintained"],status[x=="Maintained"])~x[x=="Maintained"], data=leukemia)
+time <- summary(fit1)$time
+surv<- summary(fit1)$surv
+p <- 0.5
+min(time[surv<=1-p])
+h<- 0.25
+min(time[surv<=1-0.75])
+```
+
+```{r}
+#d) is there signif diff between two groups
+survdiff(Surv(time,status)~x, data=leukemia)
+```
+since p-value is 0.07 bigger than 0.05. we do not rehect h0 meaning that there is no signif different between the two groups.
+
+##question 2
+
+```{r}
+library(readr)
+diabetes <- read_csv("C:/Users/Asus/Downloads/diabetes.csv")
+attach(diabetes)
+model <- survfit(Surv(lzeit[diab==1],tod[diab==1])~diab[diab==1], data=diabetes)
+summary(model)
+plot(model,conf.int = "none") #buang interval
+```
+
+```{r}
+time <- summary(model)$time
+surv<- summary(model)$surv
+p <- 0.5
+min(time[surv<=1-p])
+min(time[surv<=1-0.75])
+```
+
+```{r}
+plot(model,conf.int = "none") #buang interval
+```
+
+```{r}
+model1 <- survfit(Surv(lzeit,tod)~diab, data=diabetes)
+plot(model1)
+```
+
+```{r}
+survdiff(Surv(lzeit,tod)~diab, data=diabetes)
+```
+
+Sonce p-value is 0.02 less than 0.05. We reject h0 and conclude that there is no significant different between two groups.
