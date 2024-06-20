@@ -137,27 +137,42 @@ summary(qcc(diameterP,type="S"))
 data$xbar <- apply(data[,2:6], 1, mean)
 data$r <- apply(data[,2:6], 1, function(x) diff(range(x)))
 data$s <- apply(data[,2:6], 1, sd)
-Centerline_xbar <- mean(data$xbar)
-Centerline_r <- mean(data$r)
-Centerline_s <- mean(data$s)
+centerline_xbar <- mean(data$xbar)
+centerline_r <- mean(data$r)
+centerline_s <- mean(data$s)
 
 A2 <- 0.577
 D4 <- 2.114
 D3 <- 0
-Ucl_xbar <- centerline_xbar + A2*centerline_r
-Lcl_xbar <- centerline_xbar - A2*centerline_r
-Ucl_r <- D4*centerline_r
-Lcl_r <- D3*centerline_r
+ucl_xbar <- centerline_xbar + A2*centerline_r
+lcl_xbar <- centerline_xbar - A2*centerline_r
+ucl_r <- D4*centerline_r
+lcl_r <- D3*centerline_r
 
 A3 <- 1.427
 B4 <- 2.089
 B3 <- 0
-Ucl_xbar <- centerline_xbar + A3*centerline_s
-Lcl_xbar <- centerline_xbar - A3*centerline_s
-Ucl_s <- B4*centerline_s
-Lcl_s <- B3*centerline_s
+ucl_xbar <- centerline_xbar + A3*centerline_s
+lcl_xbar <- centerline_xbar - A3*centerline_s
+ucl_s <- B4*centerline_s
+lcl_s <- B3*centerline_s
 
+qcc( data=data$xbar, type=”xbar”, sizes=5, digits=2, limits=c(lcl_xbar, ucl_xbar), plot=TRUE, stdev=centerline_r)
+qcc(data=data$r, type=”R”, sizes=5, digits=2, limits=c(lcl_r,ucl_r),plot=TRUE, stdev=centerline_r, title=”Sample R chart”)
+qcc(data=data$s, type=”S”, sizes=5, digits=2, limits=c(lcl_s,ucl_s),plot=TRUE, stdev=centerline_s, title=”Sample S chart”)
 
+#########################################
+#process capability calculation
+#ESTIMATE PROCESS CAPABILITY (purpose : to understand the chance of nonconforming products that will be produced)
+
+usl = 40
+lsl = 20
+d2=2.326
+p.sd= g.R.mean/d2
+pcr <- (usl-lsl)/(6*p.sd)
+
+#PERCENTAGE OF SPECIFICATION BAND
+p <- (1/pcr)*100
 
 
  
